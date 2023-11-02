@@ -4,10 +4,9 @@ import SpotifyWebApi from "spotify-web-api-js";
 import SelectableTrackCard from "./components/SelectableTrackCard/SelectableTrackCard";
 import { Container, Button, Stack, Modal } from "react-bootstrap";
 const URL = "https://spotify-playlist.coleamlong.com";
-// const URL = "http://localhost:3000";
 
 const CLIENT_ID = "91d037f7894441b2aab67c0acec6689d";
-const REDIRECT_URI = URL;
+const REDIRECT_URI = "https://spotify-playlist.coleamlong.com";
 const AUTH_URL = "https://accounts.spotify.com/authorize";
 const SCOPES = [
     "user-top-read",
