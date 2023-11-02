@@ -1,11 +1,10 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
+import SpotifyWebApi from "spotify-web-api-js";
 
-import SelectableTrackCard from "./components/SelectableTrackCard";
-
-import { Container, Button, Row, Col } from "react-bootstrap";
-
-const URL = "https://spotify-playlist.coleamlong.com";
+import SelectableTrackCard from "./components/SelectableTrackCard/SelectableTrackCard";
+import { Container, Button, Stack, Modal } from "react-bootstrap";
+// const URL = "https://spotify-playlist.coleamlong.com";
+const URL = "http://localhost:3000";
 
 const CLIENT_ID = "91d037f7894441b2aab67c0acec6689d";
 const REDIRECT_URI = URL;
@@ -19,128 +18,18 @@ const SCOPES = [
 
 const LOGIN_URL = `${AUTH_URL}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=${SCOPES}&response_type=token`;
 
-const API_BASE_URL = "https://api.spotify.com/v1";
+const spotifyApi = new SpotifyWebApi();
 
-function App() {
-    const [token, setToken] = useState("");
-    // const [userId, setUserId] = useState("");
-    // const [playlistId, setPlaylistId] = useState("");
+const App = () => {
+    // State variables using useState
     const [topTracks, setTopTracks] = useState([]);
     const [seedTracks, setSeedTracks] = useState([]);
-    // const [trackRecs, setTrackRecs] = useState([]);
-    // const [recUris, setRecUris] = useState([]);
+    const [userData, setUserData] = useState("");
 
-    useEffect(() => {
-        const url = window.location.hash;
-        const accessTokenPattern = /access_token=([^&]+)/;
-        const match = url.match(accessTokenPattern);
-
-        if (match) {
-            setToken(match[1]);
-
-            window.history.replaceState({}, document.title, URL);
-        }
-    }, [token]);
-
-    const fetchTracks = () => {
-        console.log(token);
-        if (topTracks.length === 0) {
-            axios
-                .get(API_BASE_URL + "/me/top/tracks?limit=16", {
-                    headers: { Authorization: `Bearer ${token}` },
-                })
-                .then((response) => {
-                    setTopTracks(response.data.items);
-                })
-                .catch((error) => {
-                    console.error("Error fetching top tracks: ", error);
-                });
-        }
+    // Event handlers for various actions
+    const handleLogin = () => {
+        window.location.href = LOGIN_URL;
     };
-
-    // const fetchRecommendations = () => {
-    //     if (seedTracks.length > 0 && seedTracks.length <= 5) {
-    //         console.log(seedTracks);
-    //         axios
-    //             .get(
-    //                 `${API_BASE_URL}/recommendations?limit=5&market=US&seed_tracks=${seedTracks.join(
-    //                     ","
-    //                 )}`,
-    //                 {
-    //                     headers: { Authorization: `Bearer ${token}` },
-    //                 }
-    //             )
-    //             .then((response) => {
-    //                 setTrackRecs(response.data);
-    //                 console.log("Recs: " + JSON.stringify(trackRecs));
-    //             })
-    //             .catch((error) => {
-    //                 console.error("Error fetching recommendations: ", error);
-    //             });
-    //     }
-    // };
-
-    // const makePlaylist = () => {
-    //     console.log(trackRecs.tracks);
-    //     if (trackRecs.tracks.length > 0) {
-    //         let uris = [];
-    //         for (let i = 0; i < trackRecs.tracks.length; i++) {
-    //             uris.push(trackRecs.tracks[i].uri);
-    //         }
-
-    //         setRecUris(uris);
-    //         console.log(recUris);
-
-    //         axios
-    //             .get(API_BASE_URL + "/me", {
-    //                 headers: { Authorization: `Bearer ${token}` },
-    //             })
-    //             .then((response) => {
-    //                 setUserId(response.data.id);
-    //                 console.log(userId);
-    //             })
-    //             .catch((error) => {
-    //                 console.error("Error fetching user info: ", error);
-    //             });
-    //         console.log(
-    //             `${API_BASE_URL}/users/${userId}/playlists?name=TestRecs`
-    //         );
-    //         setTimeout(() => {
-    //             axios
-    //                 .post(
-    //                     `${API_BASE_URL}/users/${userId}/playlists?name=TestRecs`,
-    //                     {
-    //                         headers: { Authorization: `Bearer ${token}` },
-    //                     }
-    //                 )
-    //                 .then((response) => {
-    //                     setPlaylistId(response.data.id);
-    //                     console.log(playlistId);
-    //                 })
-    //                 .catch((error) => {
-    //                     console.error("Error creating playlist: ", error);
-    //                 });
-
-    //             setTimeout(() => {
-    //                 axios
-    //                     .post(
-    //                         `${API_BASE_URL}/playlists/${playlistId}/tracks?uris=${recUris.join(
-    //                             ","
-    //                         )}`,
-    //                         {
-    //                             headers: { Authorization: `Bearer ${token}` },
-    //                         }
-    //                     )
-    //                     .then(() => {
-    //                         console.log("Added URIs");
-    //                     })
-    //                     .catch((error) => {
-    //                         console.error("Error creating playlist: ", error);
-    //                     });
-    //             }, 1000);
-    //         }, 1000);
-    //     }
-    // };
 
     const handleTrackSelect = (trackId) => {
         if (seedTracks.includes(trackId)) {
@@ -151,55 +40,136 @@ function App() {
                 setSeedTracks([...seedTracks, trackId]);
             }
         }
-        console.log(seedTracks);
     };
 
+    const handleGen = async () => {
+        let recTracks = [];
+        let uris = [];
+
+        await spotifyApi
+            .getRecommendations({
+                seed_tracks: seedTracks,
+            })
+            .then((data) => {
+                recTracks = data.tracks;
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+
+        if (recTracks.length === 0) return;
+
+        console.log("Getting uris. Test:", recTracks[0]);
+        for (let i = 0; i < recTracks.length; i++) {
+            uris.push(recTracks[i].uri);
+        }
+
+        if (uris.length === 0) return;
+
+        console.log("Generating playlist");
+        spotifyApi
+            .createPlaylist(userData, {
+                name: "Track Recommendations",
+                description: "A list of new tracks for you to discover!",
+            })
+            .then((data) => {
+                return spotifyApi.addTracksToPlaylist(data.id, uris);
+            })
+            .then((data) => {
+                console.log("PLAYLIST MADE");
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    // useEffect hook for handling user authentication
+    useEffect(() => {
+        const hashParams = window.location.hash
+            .substring(1)
+            .split("&")
+            .reduce((acc, param) => {
+                const [key, value] = param.split("=");
+                acc[key] = value;
+                return acc;
+            }, {});
+
+        if (hashParams.access_token) {
+            spotifyApi.setAccessToken(hashParams.access_token);
+        }
+
+        if (topTracks.length === 0) {
+            spotifyApi
+                .getMyTopTracks()
+                .then((data) => {
+                    setTopTracks(data.items);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
+
+        if (!userData) {
+            spotifyApi
+                .getMe()
+                .then((data) => {
+                    setUserData(data.id);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
+    });
+
+    // Return the JSX to render the application UI
     return (
-        <Container className="text-center">
-            <h1 className="py-5">Spotify Playlist Generator</h1>
-            {!token && (
-                <a href={LOGIN_URL}>
-                    <Button size={"lg"}>Login with Spotify</Button>
-                </a>
-            )}
-
-            {token && (
-                <div>
-                    <Button
-                        disabled={topTracks.length > 0}
-                        size={"lg"}
-                        onClick={fetchTracks}
-                    >
-                        Get Top Tracks
-                    </Button>
-                </div>
-            )}
-
-            <Container className="py-5">
-                <Row className="gap-3">
-                    {topTracks.map((track) => {
-                        return (
-                            <Col className="d-flex align-items-stretch">
-                                <SelectableTrackCard
-                                    key={track.id}
-                                    selected={false}
-                                    track={track}
-                                    onSelect={handleTrackSelect}
-                                />
-                            </Col>
-                        );
-                    })}
-                </Row>
+        <Modal.Dialog>
+            <Container className="text-center pt-5">
+                <Modal.Title>Spotify Playlist Generator</Modal.Title>
+                <p>
+                    Use this tool to create a custom Spotify playlist full of
+                    new music inspired by your favorite songs.
+                </p>
             </Container>
-            {/* <Container>
-                {seedTracks.map((track) => {
-                    return <p>{track}</p>;
-                })}
-            </Container> */}
-            {/* <Button onClick={fetchRecommendations}>Recs</Button>
-            <Button onClick={makePlaylist}>playlist</Button> */}
-        </Container>
+            <Modal.Body>
+                {topTracks.length === 0 ? (
+                    <Container className="text-center pb-3">
+                        <Button size="lg" onClick={handleLogin}>
+                            Login with Spotify
+                        </Button>
+                    </Container>
+                ) : (
+                    <Container>
+                        <Container className="text-center pb-3">
+                            <Button
+                                disabled={
+                                    seedTracks.length === 0 &&
+                                    seedTracks.length <= 5
+                                }
+                                size="lg"
+                                onClick={handleGen}
+                            >
+                                Generate Playlist
+                            </Button>
+                        </Container>
+
+                        <Stack className="gap-3 d-flex justify-content-center">
+                            {topTracks.map((track) => {
+                                return (
+                                    <SelectableTrackCard
+                                        key={track.id}
+                                        selected={false}
+                                        track={track}
+                                        onSelect={handleTrackSelect}
+                                    />
+                                );
+                            })}
+                        </Stack>
+                    </Container>
+                )}
+            </Modal.Body>
+        </Modal.Dialog>
     );
-}
+};
 
 export default App;
