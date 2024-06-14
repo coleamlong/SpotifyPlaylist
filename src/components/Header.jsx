@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Stack, Modal, Button, Box, Typography } from "@mui/material";
+import { Modal, Button, Box, Typography } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 
 import { REDIRECT_URI, spotifyApi } from "../constants/Spotify";
 
-const Header = (props) => {
+const Header = ({ user, setUser }) => {
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
@@ -23,16 +23,17 @@ const Header = (props) => {
     };
 
     return (
-        <Stack
+        <Box
+            display="flex"
+            height="3em"
             justifyContent="space-between"
             alignItems="center"
             direction="row"
-            padding={1}
         >
-            <Typography variant="h5">Spotify Playlist Generator</Typography>
+            <Typography>Spotify Playlist Generator</Typography>
 
             <Button onClick={handleOpen}>
-                <FontAwesomeIcon icon={faUser} inverse size="3x" />
+                <FontAwesomeIcon icon={faUser} inverse />
             </Button>
 
             <Modal
@@ -41,36 +42,36 @@ const Header = (props) => {
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
-                {props.user ? (
+                {user ? (
                     <Box sx={modalStyle}>
                         <Typography
                             id="modal-modal-title"
                             variant="h6"
                             component="h2"
                         >
-                            {props.user.display_name}'s Profile
+                            {user.display_name}'s Profile
                         </Typography>
                         <div>
                             <img
                                 className="w-50"
                                 alt="Profile"
-                                src={props.user.images[1].url}
+                                src={user.images[1].url}
                             />
                             <Typography
                                 id="modal-modal-description"
                                 sx={{ mt: 2 }}
                             >
-                                Username: {props.user.id} <br />
-                                Region: {props.user.country} <br />
-                                Account Type: {props.user.product} <br />
-                                Followers: {props.user.followers.total} <br />
+                                Username: {user.id} <br />
+                                Region: {user.country} <br />
+                                Account Type: {user.product} <br />
+                                Followers: {user.followers.total} <br />
                             </Typography>
                         </div>
                         <div>
                             <Button
                                 onClick={() => {
                                     spotifyApi.setAccessToken(null);
-                                    props.setUser(null);
+                                    setUser(null);
                                     window.location.href = REDIRECT_URI;
                                 }}
                                 size="lg"
@@ -89,7 +90,6 @@ const Header = (props) => {
                     </Box>
                 ) : (
                     <Box sx={modalStyle}>
-                        {" "}
                         <Typography
                             id="modal-modal-title"
                             variant="h6"
@@ -100,7 +100,7 @@ const Header = (props) => {
                     </Box>
                 )}
             </Modal>
-        </Stack>
+        </Box>
     );
 };
 

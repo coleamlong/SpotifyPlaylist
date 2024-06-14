@@ -11,7 +11,7 @@ import {
     Typography,
     Skeleton,
 } from "@mui/material";
-import TrackInfoPanel from "./TrackInfoPanel";
+import TrackInfo from "./TrackInfo";
 
 import { makeStyles } from "@mui/styles"; // Import makeStyles from @mui/styles
 
@@ -25,16 +25,17 @@ const useStyles = makeStyles({
         overflow: "hidden",
         textOverflow: "ellipsis",
     },
+    tableContainer: {
+        maxHeight: 425, // Set the maximum height for the table container
+    },
 });
 
 const Tracklist = ({
     title,
     tracks,
-    trackInfoPanel,
     buttonType,
-    handleAdd,
-    handleRemove,
-    height,
+    handleButtonClick,
+    showTrackInfo,
 }) => {
     const classes = useStyles();
 
@@ -42,32 +43,36 @@ const Tracklist = ({
 
     const handleClick = (track) => {
         console.log("Clicking track: " + track.name);
-        handleAdd(track);
-        handleRemove(track);
+        handleButtonClick(track);
     };
 
     return (
         <div>
-            <Typography variant="h6" gutterBottom textAlign={"center"}>
+            <Typography variant="h6" textAlign={"center"}>
                 {title}
             </Typography>
-            {trackInfoPanel && <TrackInfoPanel track={selectedTrack} />}
+            {showTrackInfo && <TrackInfo track={selectedTrack} />}
             <TableContainer
                 component={Paper}
+                className={classes.tableContainer} // Apply the custom class here
                 sx={{
-                    height: height,
-                    maxHeight: height,
                     overflowY: "auto",
                 }}
             >
                 <Table stickyHeader className={classes.table}>
                     <TableHead>
                         <TableRow>
-                            <TableCell></TableCell>
-                            <TableCell sx={classes.cell}>Title</TableCell>
-                            <TableCell sx={classes.cell}>Album</TableCell>
-                            <TableCell sx={classes.cell}>Artists</TableCell>
-                            <TableCell></TableCell>
+                            <TableCell />
+                            <TableCell className={classes.cell}>
+                                Title
+                            </TableCell>
+                            <TableCell className={classes.cell}>
+                                Album
+                            </TableCell>
+                            <TableCell className={classes.cell}>
+                                Artists
+                            </TableCell>
+                            <TableCell />
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -77,7 +82,7 @@ const Tracklist = ({
                                     key={track.id}
                                     selected={selectedTrack === track}
                                     onClick={() => {
-                                        if (trackInfoPanel) {
+                                        if (showTrackInfo) {
                                             setSelectedTrack(track);
                                         }
                                     }}
@@ -89,13 +94,13 @@ const Tracklist = ({
                                             style={{ width: "3rem" }}
                                         />
                                     </TableCell>
-                                    <TableCell sx={classes.cell}>
+                                    <TableCell className={classes.cell}>
                                         {track.name}
                                     </TableCell>
-                                    <TableCell sx={classes.cell}>
+                                    <TableCell className={classes.cell}>
                                         {track.album.name}
                                     </TableCell>
-                                    <TableCell sx={classes.cell}>
+                                    <TableCell className={classes.cell}>
                                         {track.artists.map((artist, index) => {
                                             return `${artist.name}${
                                                 index < track.artists.length - 1
@@ -114,11 +119,7 @@ const Tracklist = ({
                                 </TableRow>
                             ))
                         ) : (
-                            <Skeleton
-                                variant="rectangular"
-                                width="100%"
-                                height={height}
-                            />
+                            <Skeleton variant="rectangular" width="100%" />
                         )}
                     </TableBody>
                 </Table>

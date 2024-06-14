@@ -1,7 +1,5 @@
 import React, { useEffect } from "react";
-
 import { Button } from "@mui/material";
-
 import {
     spotifyApi,
     AUTH_URL,
@@ -10,13 +8,20 @@ import {
     SCOPES,
 } from "../constants/Spotify.jsx";
 
-const LoginModal = (props) => {
+const LoginButton = ({ handleLogin }) => {
     const handleClick = () => {
-        let LOGIN_URL = `${AUTH_URL}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=${SCOPES}&response_type=token`;
-        window.location.href = LOGIN_URL;
+        window.location.href = getLoginUrl();
     };
 
     useEffect(() => {
+        handleAccessToken();
+    });
+
+    const getLoginUrl = () => {
+        return `${AUTH_URL}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=${SCOPES}&response_type=token`;
+    };
+
+    const handleAccessToken = () => {
         const hashParams = window.location.hash
             .substring(1)
             .split("&")
@@ -28,27 +33,23 @@ const LoginModal = (props) => {
 
         if (hashParams.access_token) {
             spotifyApi.setAccessToken(hashParams.access_token);
-
             spotifyApi
                 .getMe()
                 .then((data) => {
                     console.log(data);
-
-                    props.handleLogin(data);
+                    handleLogin(data);
                 })
                 .catch((err) => {
                     console.log(err);
                 });
         }
-    });
+    };
 
     return (
-        <div>
-            <Button variant="contained" onClick={handleClick}>
-                Login with Spotify
-            </Button>
-        </div>
+        <Button variant="contained" onClick={handleClick}>
+            Login with Spotify
+        </Button>
     );
 };
 
-export default LoginModal;
+export default LoginButton;

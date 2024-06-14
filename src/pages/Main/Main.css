@@ -1,0 +1,7 @@
+.panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 2fr 1fr;
+    width: 100%;
+    height: calc(100vh - 3em);
+}
