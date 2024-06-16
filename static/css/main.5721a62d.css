@@ -1,0 +1,2 @@
+.panels{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:2fr 1fr;height:97vh;width:100%}@media (max-width:768px){.panels{grid-template-columns:1fr}}
+/*# sourceMappingURL=main.5721a62d.css.map*/
