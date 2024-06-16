@@ -1,7 +1,7 @@
 import React from "react";
-import Panel from "../Panel";
-import Tracklist from "../Tracklist";
-import RecButton from "../RecButton";
+import Panel from "../Panel.jsx";
+import Tracklist from "../Tracklist.jsx";
+import RecButton from "../RecButton.jsx";
 import { Stack } from "@mui/material";
 import { spotifyApi } from "../../constants/Spotify.jsx";
 

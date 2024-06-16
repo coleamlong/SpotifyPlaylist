@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Stack } from "@mui/material";
 import "./Main.css";
 import { spotifyApi } from "../../constants/Spotify.jsx";
-import TopTrackPanel from "../../components/Panels/TopTrackPanel.jsx";
-import RecTrackPanel from "../../components/Panels/RecTrackPanel.jsx";
-import SeedTrackPanel from "../../components/Panels/SeedTrackPanel.jsx";
-import ExportPanel from "../../components/Panels/ExportPanel.jsx";
+import TopTrackPanel from "../../components/ContentPanels/TopTrackPanel.jsx";
+import RecTrackPanel from "../../components/ContentPanels/RecTrackPanel.jsx";
+import SeedTrackPanel from "../../components/ContentPanels/SeedTrackPanel.jsx";
+import ExportPanel from "../../components/ContentPanels/ExportPanel.jsx";
 import useWindowSize from "../../hooks/useWindowSize.jsx";
 
 const Main = ({ user, setUser }) => {
