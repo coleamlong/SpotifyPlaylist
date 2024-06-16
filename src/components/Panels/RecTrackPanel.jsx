@@ -11,7 +11,6 @@ const RecTrackPanel = ({ recTracks, setRecTracks }) => {
         <Panel>
             <Tracklist
                 title="Recommended Tracks"
-                showTrackInfo
                 tracks={recTracks}
                 buttonType="Remove"
                 handleButtonClick={handleRecTrackRemove}

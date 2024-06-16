@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
     Table,
     TableBody,
@@ -11,82 +11,61 @@ import {
     Typography,
     Skeleton,
 } from "@mui/material";
-import TrackInfo from "./TrackInfo";
-
-import { makeStyles } from "@mui/styles"; // Import makeStyles from @mui/styles
+import { makeStyles } from "@mui/styles";
+import { useMediaQuery } from "@mui/material";
 
 const useStyles = makeStyles({
-    table: {
-        minWidth: 650,
-    },
     cell: {
-        maxWidth: 100, // Adjust the maximum width to your preference
+        maxWidth: 100,
         whiteSpace: "nowrap",
         overflow: "hidden",
         textOverflow: "ellipsis",
     },
     tableContainer: {
-        maxHeight: 425, // Set the maximum height for the table container
+        maxHeight: 475,
     },
 });
 
-const Tracklist = ({
-    title,
-    tracks,
-    buttonType,
-    handleButtonClick,
-    showTrackInfo,
-}) => {
+const Tracklist = ({ title, tracks, buttonType, handleButtonClick }) => {
     const classes = useStyles();
-
-    const [selectedTrack, setSelectedTrack] = useState({});
+    const isSmallScreen = useMediaQuery("(max-width: 600px)");
 
     const handleClick = (track) => {
         console.log("Clicking track: " + track.name);
         handleButtonClick(track);
     };
 
+    const renderTableCell = (content, key) => (
+        <TableCell key={key} className={classes.cell}>
+            {content}
+        </TableCell>
+    );
+
     return (
         <div>
-            <Typography variant="h6" textAlign={"center"}>
+            <Typography variant="h6" gutterBottom textAlign="center">
                 {title}
             </Typography>
-            {showTrackInfo && <TrackInfo track={selectedTrack} />}
             <TableContainer
                 component={Paper}
-                className={classes.tableContainer} // Apply the custom class here
-                sx={{
-                    overflowY: "auto",
-                }}
+                className={classes.tableContainer}
             >
                 <Table stickyHeader className={classes.table}>
                     <TableHead>
                         <TableRow>
                             <TableCell />
-                            <TableCell className={classes.cell}>
-                                Title
-                            </TableCell>
-                            <TableCell className={classes.cell}>
-                                Album
-                            </TableCell>
-                            <TableCell className={classes.cell}>
-                                Artists
-                            </TableCell>
+                            {renderTableCell("Title", "title")}
+                            {!isSmallScreen &&
+                                renderTableCell("Album", "album")}
+                            {!isSmallScreen &&
+                                renderTableCell("Artists", "artists")}
                             <TableCell />
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {tracks.length > 0 ? (
                             tracks.map((track) => (
-                                <TableRow
-                                    key={track.id}
-                                    selected={selectedTrack === track}
-                                    onClick={() => {
-                                        if (showTrackInfo) {
-                                            setSelectedTrack(track);
-                                        }
-                                    }}
-                                >
+                                <TableRow key={track.id}>
                                     <TableCell padding="none">
                                         <img
                                             src={track.album.images[2].url}
@@ -94,21 +73,32 @@ const Tracklist = ({
                                             style={{ width: "3rem" }}
                                         />
                                     </TableCell>
-                                    <TableCell className={classes.cell}>
-                                        {track.name}
-                                    </TableCell>
-                                    <TableCell className={classes.cell}>
-                                        {track.album.name}
-                                    </TableCell>
-                                    <TableCell className={classes.cell}>
-                                        {track.artists.map((artist, index) => {
-                                            return `${artist.name}${
-                                                index < track.artists.length - 1
-                                                    ? ", "
-                                                    : ""
-                                            }`;
-                                        })}
-                                    </TableCell>
+                                    {renderTableCell(
+                                        track.name,
+                                        `name-${track.id}`
+                                    )}
+                                    {!isSmallScreen &&
+                                        renderTableCell(
+                                            track.album.name,
+                                            `album-${track.id}`
+                                        )}
+                                    {!isSmallScreen &&
+                                        renderTableCell(
+                                            track.artists
+                                                .map(
+                                                    (artist, index) =>
+                                                        `${artist.name}${
+                                                            index <
+                                                            track.artists
+                                                                .length -
+                                                                1
+                                                                ? ", "
+                                                                : ""
+                                                        }`
+                                                )
+                                                .join(""),
+                                            `artists-${track.id}`
+                                        )}
                                     <TableCell padding="none">
                                         <Button
                                             onClick={() => handleClick(track)}

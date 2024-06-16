@@ -2,6 +2,13 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 2fr 1fr;
+
     width: 100%;
-    height: calc(100vh - 3em);
+    height: calc(100vh - 3vh);
+}
+
+@media (max-width: 768px) {
+    .panels {
+        grid-template-columns: 1fr;
+    }
 }

@@ -9,11 +9,11 @@ const TopTrackPanel = ({
     setSeedTracks,
 }) => {
     const handleSeedTrackAdd = (track) => {
-        if (seedTracks.length < 5) {
+        if (seedTracks.length < 3) {
             setTopTracks(topTracks.filter((t) => t.id !== track.id));
             setSeedTracks([...seedTracks, track]);
         } else {
-            alert("Can only have 5 seed tracks");
+            alert("Can only have 3 seed tracks");
         }
     };
 
@@ -21,7 +21,6 @@ const TopTrackPanel = ({
         <Panel>
             <Tracklist
                 title="Top Tracks"
-                showTrackInfo
                 tracks={topTracks}
                 buttonType="Add"
                 handleButtonClick={handleSeedTrackAdd}

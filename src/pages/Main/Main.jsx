@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Header from "../../components/Header";
 import { Stack } from "@mui/material";
 import "./Main.css";
 import { spotifyApi } from "../../constants/Spotify.jsx";
@@ -7,11 +6,13 @@ import TopTrackPanel from "../../components/Panels/TopTrackPanel.jsx";
 import RecTrackPanel from "../../components/Panels/RecTrackPanel.jsx";
 import SeedTrackPanel from "../../components/Panels/SeedTrackPanel.jsx";
 import ExportPanel from "../../components/Panels/ExportPanel.jsx";
+import useWindowSize from "../../hooks/useWindowSize.jsx";
 
 const Main = ({ user, setUser }) => {
     const [topTracks, setTopTracks] = useState([]);
     const [seedTracks, setSeedTracks] = useState([]);
     const [recTracks, setRecTracks] = useState([]);
+    const { width } = useWindowSize();
 
     useEffect(() => {
         if (user) {
@@ -35,7 +36,6 @@ const Main = ({ user, setUser }) => {
                 height: "100vh",
             }}
         >
-            <Header user={user} serUser={setUser} />
             <div className="panels">
                 <TopTrackPanel
                     topTracks={topTracks}
@@ -43,17 +43,36 @@ const Main = ({ user, setUser }) => {
                     seedTracks={seedTracks}
                     setSeedTracks={setSeedTracks}
                 />
-                <RecTrackPanel
-                    recTracks={recTracks}
-                    setRecTracks={setRecTracks}
-                />
-                <SeedTrackPanel
-                    seedTracks={seedTracks}
-                    setSeedTracks={setSeedTracks}
-                    topTracks={topTracks}
-                    setTopTracks={setTopTracks}
-                />
-                <ExportPanel />
+                {width < 768 ? (
+                    <>
+                        <SeedTrackPanel
+                            seedTracks={seedTracks}
+                            setSeedTracks={setSeedTracks}
+                            topTracks={topTracks}
+                            setTopTracks={setTopTracks}
+                            setRecTracks={setRecTracks}
+                        />
+                        <RecTrackPanel
+                            recTracks={recTracks}
+                            setRecTracks={setRecTracks}
+                        />
+                    </>
+                ) : (
+                    <>
+                        <RecTrackPanel
+                            recTracks={recTracks}
+                            setRecTracks={setRecTracks}
+                        />
+                        <SeedTrackPanel
+                            seedTracks={seedTracks}
+                            setSeedTracks={setSeedTracks}
+                            topTracks={topTracks}
+                            setTopTracks={setTopTracks}
+                            setRecTracks={setRecTracks}
+                        />
+                    </>
+                )}
+                <ExportPanel tracks={recTracks} user={user} />
             </div>
         </Stack>
     );
